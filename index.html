@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador de Agendamento</title>
+    <style>
+      /* Estilos de tela (visualização) */
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #525659;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .controls {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      input[type="date"] {
+        padding: 8px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      button:hover {
+        background-color: #004494;
+      }
+
+      /* Estilo da Página A4 e Redução de Margens Nativas do Navegador */
+      @page {
+        size: A4;
+        margin: 10px;
+        /* Margem mínima de 10px no papel */
+      }
+
+      .page {
+        background: white;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto 20px auto;
+        padding: 15mm 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+        page-break-after: always;
+      }
+
+      /* Tipografia e Estrutura das Tabelas */
+      h1 {
+        text-align: center;
+        font-size: 22px;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #666;
+      }
+
+      .tv-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 15px 0 5px 0;
+        border-left: 4px solid #0056b3;
+        padding-left: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 8px 4px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #e9ecef;
+        font-weight: bold;
+      }
+
+      td:nth-child(1),
+      td:nth-child(2) {
+        font-weight: bold;
+        background-color: #f8f9fa;
+        width: 10%;
+      }
+
+      /* Estilos de Impressão */
+      @media print {
+        body {
+          background: white;
+          margin: 0;
+          padding: 0;
+        }
+
+        .controls {
+          display: none !important;
+        }
+
+        .page {
+          margin: 0;
+          padding: 10px;
+          /* Mantém a margem de 10px na hora de imprimir */
+          box-shadow: none;
+          width: 100%;
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="controls no-print">
+      <label for="weekDate"
+        ><strong
+          >Selecione uma data na semana desejada (dd/mm/yyyy):</strong
+        ></label
+      >
+      <input type="date" id="weekDate" onchange="updateDates()" />
+      <button onclick="window.print()">🖨️ Imprimir Agenda</button>
+    </div>
+
+    <div class="page" id="page1">
+      <h1>Agendamento das Televisões - Superior</h1>
+      <div class="subtitle">
+        Semana <span class="week-range">____/____/____ à ____/____/____</span>
+      </div>
+
+      <div class="tv-title">Tv 1 Piso Superior</div>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Aula</th>
+            <th class="col-day-0">Segunda<br />___/___/___</th>
+            <th class="col-day-1">Terça<br />___/___/___</th>
+            <th class="col-day-2">Quarta<br />___/___/___</th>
+            <th class="col-day-3">Quinta<br />___/___/___</th>
+            <th class="col-day-4">Sexta<br />___/___/___</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-template-1"></tbody>
+      </table>
+
+      <div class="tv-title">Tv 2 Piso Superior</div>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Aula</th>
+            <th class="col-day-0">Segunda<br />___/___/___</th>
+            <th class="col-day-1">Terça<br />___/___/___</th>
+            <th class="col-day-2">Quarta<br />___/___/___</th>
+            <th class="col-day-3">Quinta<br />___/___/___</th>
+            <th class="col-day-4">Sexta<br />___/___/___</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-template-2"></tbody>
+      </table>
+
+      <div class="tv-title">Tv 3 Piso Superior</div>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Aula</th>
+            <th class="col-day-0">Segunda<br />___/___/___</th>
+            <th class="col-day-1">Terça<br />___/___/___</th>
+            <th class="col-day-2">Quarta<br />___/___/___</th>
+            <th class="col-day-3">Quinta<br />___/___/___</th>
+            <th class="col-day-4">Sexta<br />___/___/___</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-template-3"></tbody>
+      </table>
+    </div>
+
+    <div class="page" id="page2">
+      <h1>Agendamento das Televisões - Inferior</h1>
+      <div class="subtitle">
+        Semana <span class="week-range">____/____/____ à ____/____/____</span>
+      </div>
+
+      <div class="tv-title">Tv 1 Piso Inferior</div>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Aula</th>
+            <th class="col-day-0">Segunda<br />___/___/___</th>
+            <th class="col-day-1">Terça<br />___/___/___</th>
+            <th class="col-day-2">Quarta<br />___/___/___</th>
+            <th class="col-day-3">Quinta<br />___/___/___</th>
+            <th class="col-day-4">Sexta<br />___/___/___</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-template-4"></tbody>
+      </table>
+    </div>
+
+    <div class="page" id="page3">
+      <h1>Agendamento da Sala de Informática</h1>
+      <div class="subtitle">
+        Semana <span class="week-range">____/____/____ à ____/____/____</span>
+      </div>
+
+      <table class="schedule-table" style="margin-top: 30px">
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Aula</th>
+            <th class="col-day-0">Segunda<br />___/___/___</th>
+            <th class="col-day-1">Terça<br />___/___/___</th>
+            <th class="col-day-2">Quarta<br />___/___/___</th>
+            <th class="col-day-3">Quinta<br />___/___/___</th>
+            <th class="col-day-4">Sexta<br />___/___/___</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-template-5"></tbody>
+      </table>
+    </div>
+
+    <script>
+      const rowsHTML = `
+            <tr><td>Manhã</td><td>1ª/2ª aula</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Manhã</td><td>3ª/4ª aula</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr>
+              <td style="border-bottom: 4px solid #000;">Manhã</td>
+              <td style="border-bottom: 4px solid #000;">5ª/6ª aula</td>
+              <td style="border-bottom: 4px solid #000;">
+                </td><td style="border-bottom: 4px solid #000;">
+                </td><td style="border-bottom: 4px solid #000;">
+                </td><td style="border-bottom: 4px solid #000;">
+                </td><td style="border-bottom: 4px solid #000;">
+                  </td>
+              </tr>
+            <tr><td>Tarde</td><td>1ª/2ª aula</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Tarde</td><td>3ª/4ª aula</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td>Tarde</td><td>5ª/6ª aula</td><td></td><td></td><td></td><td></td><td></td></tr>
+        `;
+
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById("tbody-template-" + i).innerHTML = rowsHTML;
+      }
+
+      function updateDates() {
+        const dateInput = document.getElementById("weekDate").value;
+        if (!dateInput) return;
+
+        const parts = dateInput.split("-");
+        let d = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        d.setDate(diff);
+
+        const weekDays = [];
+        for (let i = 0; i < 5; i++) {
+          let current = new Date(d);
+          current.setDate(d.getDate() + i);
+
+          let dayStr = String(current.getDate()).padStart(2, "0");
+          let monthStr = String(current.getMonth() + 1).padStart(2, "0");
+          let yearStr = current.getFullYear();
+
+          weekDays.push(`${dayStr}/${monthStr}/${yearStr}`);
+        }
+
+        document.querySelectorAll(".week-range").forEach((el) => {
+          el.innerText = `${weekDays[0]} à ${weekDays[4]}`;
+        });
+
+        const dayNames = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+        for (let i = 0; i < 5; i++) {
+          document.querySelectorAll(".col-day-" + i).forEach((el) => {
+            // Mantém o layout com a quebra de linha após escolher a data
+            el.innerHTML = `${dayNames[i]}<br>${weekDays[i]}`;
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
